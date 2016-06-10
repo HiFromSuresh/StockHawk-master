@@ -1,13 +1,18 @@
 package com.sam_chordas.android.stockhawk.rest;
 
+import android.annotation.TargetApi;
 import android.content.ContentProviderOperation;
+import android.os.Build;
 import android.util.Log;
+
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
-import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Created by sam_chordas on 10/8/15.
@@ -18,6 +23,7 @@ public class Utils {
 
   public static boolean showPercent = true;
 
+  @TargetApi(Build.VERSION_CODES.KITKAT)
   public static ArrayList quoteJsonToContentVals(String JSON){
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
     JSONObject jsonObject = null;
@@ -28,9 +34,16 @@ public class Utils {
         jsonObject = jsonObject.getJSONObject("query");
         int count = Integer.parseInt(jsonObject.getString("count"));
         if (count == 1){
-          jsonObject = jsonObject.getJSONObject("results")
-              .getJSONObject("quote");
-          batchOperations.add(buildBatchOperation(jsonObject));
+          String str  = jsonObject.getJSONObject("results")
+              .getJSONObject("quote").getString("BookValue");
+          /*JSONArray jsonAr = jsonObject.getJSONArray("nameValuePairs");
+                  // //new JSONArray(jsonObject).getJSONArray(0);
+          JSONObject jsonObject1 = jsonAr.getJSONObject(0);*/
+            if(str == null){
+           return null;
+          }else {
+              batchOperations.add(buildBatchOperation(jsonObject));
+          }
         } else{
           resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
 
